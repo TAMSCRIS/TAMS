@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created using an evaluation version of JasperAssistant (http://www.jasperassistant.com) -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Unnamed" pageWidth="800" pageHeight="842" columnWidth="760" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30">
+	<property name="com.jasperassistant.designer.DataSource" value="tams_153"/>
+	<property name="com.jasperassistant.designer.Grid" value="false"/>
+	<property name="com.jasperassistant.designer.SnapToGrid" value="false"/>
+	<property name="com.jasperassistant.designer.GridWidth" value="12"/>
+	<property name="com.jasperassistant.designer.GridHeight" value="12"/>
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+	<parameter name="zone" class="java.lang.String">
+		<defaultValueExpression><![CDATA["CR"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="rptMonth" class="java.lang.String">
+		<defaultValueExpression><![CDATA["December"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="rptyear" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2017"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select  case 
+when  e.orgrly = 'CR'  	then 'Central Railway'
+when  e.orgrly = 'ER'  	then 'Eastern Railway'
+when  e.orgrly = 'EC'  	then 'East Central Railway'
+when  e.orgrly = 'EO' 	then 'East Coast Railway'
+when  e.orgrly = 'KR'  	then 'Konkan Railway'
+when  e.orgrly = 'NC'  then 'North Central Railway'
+when  e.orgrly = 'NE'  	then 'North Eastern Railway'
+when  e.orgrly = 'NF'  then 'North Frontier Railway'
+when  e.orgrly = 'NR'  then 'Northern Railway'
+when  e.orgrly = 'NW' then 'North Western Railway'
+when  e.orgrly = 'SB'  	then 'South East Central Railway'
+when  e.orgrly = 'SC'  then 'South Central Railway'
+when  e.orgrly = 'SE'  	then 'South Eastern Railway'
+when  e.orgrly = 'SR'  	then 'Southern Railway'
+when  e.orgrly = 'SW'  then 'South Western Railway'
+when  e.orgrly = 'WC' then 'West Central Railway'
+when  e.orgrly = 'WR'  then 'Western  Railway'
+
+
+
+end orgrly_name,
+a.class class ,e.description description ,a.distrange distrange,
+a.Pass_thousand Pass_thousand,a.Pass_units Pass_units,
+case b.Pass_units when 0 then 0 else round((a.Pass_units/b.Pass_units)*100,2) end Pass_percentage,
+a.Pass_KM_thousand Pass_KM_thousand,a.Pass_KM_units Pass_KM_units,
+case b.Pass_KM_units when 0 then 0 else round((a.Pass_KM_units/b.Pass_KM_units)*100,2) end  Pass_KM_percentage,
+a.Earnins_in_thousand Earnins_in_thousand,a.Earning_units Earning_units,
+case b.Earning_units when 0 then 0 else round((a.Earning_units/b.Earning_units)*100,2) end Earnings_percentage, 
+case a.Pass_units when 0 then 0 else round((a.Earning_units/a.Pass_units),0) end ad_Rate_pass,
+c.adopted_lead, b.total_ad_rate_pass total_ad_rate_pass,d.total_adopted_lead total_adopted_lead
+
+from
+(select class,distrange,
+round(SUM (tpass)/1000,0 ) Pass_thousand,
+SUM(tpass) Pass_units,
+round(sum(dist*tpass)/1000,0) Pass_KM_thousand,
+sum(dist*tpass) Pass_KM_units,
+round(sum(tfare-to_number(na))/1000,0) Earnins_in_thousand,
+sum(tfare-to_number(na)) Earning_units
+from taedapprprdec
+where type not in ('2213') and orgrly = $P{zone}
+group by class,distrange 
+
+union
+
+select distinct class,distrange,0 as Pass_thousand,0 as Pass_units,0 as Pass_KM_thousand,0 as Pass_KM_units,0 as Earnins_in_thousand,0 as Earning_units
+from taedapprprdec m where  not exists
+(select * from (select * from taedapprprdec where type not in ('2213') and orgrly =$P{zone}) n 
+where m.class = n.class and m.distrange = n.distrange)
+
+
+)a,
+
+(select class,distrange,round(sum(dist*tpass)/sum(tpass),0) adopted_lead
+from taedapprprdec 
+where tpass>0 and type not in ('2213') and orgrly =$P{zone}
+group by class,distrange 
+
+union
+
+select distinct class,distrange,0 as  adopted_lead
+from taedapprprdec m where  not exists
+(select * from (select * from taedapprprdec where tpass>0 and type not in ('2213') and orgrly =$P{zone}) n 
+where m.class = n.class and m.distrange = n.distrange)
+
+) c,
+
+(select class,round(sum(dist*tpass)/sum(tpass),0) total_adopted_lead
+from taedapprprdec 
+where tpass>0 and type not in ('2213') and orgrly =$P{zone}
+group by class 
+
+union
+
+select distinct class,0 as  total_adopted_lead
+from taedapprprdec m where  not exists
+(select * from (select * from taedapprprdec where tpass>0 and type not in ('2213') and orgrly =$P{zone}) n 
+where m.class = n.class )
+
+) d,
+
+(select class,SUM(tpass) Pass_units ,sum(dist*tpass) Pass_KM_units,sum(tfare-to_number(na)) Earning_units ,
+round(sum(tfare-to_number(na))/SUM(tpass),0) total_ad_rate_pass
+from taedapprprdec where type not in ('2213') and orgrly =$P{zone}
+group by class 
+
+union
+
+select distinct class,0 as Pass_units ,0 as Pass_KM_units,0 as Earning_units ,0 as total_ad_rate_pass
+from taedapprprdec m where  not exists
+(select * from (select * from taedapprprdec where type not in ('2213') and orgrly =$P{zone}) n 
+where m.class = n.class )
+
+) b,
+
+(select a.*, 'WR' as orgrly from classdescription a) e
+
+where  a.class = b.class and a.class = c.class and a.class = d.class and e.class = a.class
+and a.distrange = c.distrange and  e.project = 'PRS'
+
+
+order by to_number(a.class),to_number(substr(a.distrange,1,instr(a.distrange,'-',1)-1))]]>
+	</queryString>
+	<field name="ADOPTED_LEAD" class="java.math.BigDecimal"/>
+	<field name="AD_RATE_PASS" class="java.math.BigDecimal"/>
+	<field name="CLASS" class="java.lang.String"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="DISTRANGE" class="java.lang.String"/>
+	<field name="EARNINGS_PERCENTAGE" class="java.math.BigDecimal"/>
+	<field name="EARNING_UNITS" class="java.math.BigDecimal"/>
+	<field name="EARNINS_IN_THOUSAND" class="java.math.BigDecimal"/>
+	<field name="ORGRLY_NAME" class="java.lang.String"/>
+	<field name="PASS_KM_PERCENTAGE" class="java.math.BigDecimal"/>
+	<field name="PASS_KM_THOUSAND" class="java.math.BigDecimal"/>
+	<field name="PASS_KM_UNITS" class="java.math.BigDecimal"/>
+	<field name="PASS_PERCENTAGE" class="java.math.BigDecimal"/>
+	<field name="PASS_THOUSAND" class="java.math.BigDecimal"/>
+	<field name="PASS_UNITS" class="java.math.BigDecimal"/>
+	<field name="TOTAL_ADOPTED_LEAD" class="java.math.BigDecimal"/>
+	<field name="TOTAL_AD_RATE_PASS" class="java.math.BigDecimal"/>
+	<variable name="noofpassthous" class="java.math.BigDecimal" resetType="Group" resetGroup="group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{PASS_THOUSAND}]]></variableExpression>
+	</variable>
+	<variable name="passunit" class="java.math.BigDecimal" resetType="Group" resetGroup="group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{PASS_UNITS}]]></variableExpression>
+	</variable>
+	<variable name="passpercentage" class="java.math.BigDecimal" resetType="Group" resetGroup="group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{PASS_PERCENTAGE}]]></variableExpression>
+	</variable>
+	<variable name="passkmthous" class="java.math.BigDecimal" resetType="Group" resetGroup="group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{PASS_KM_THOUSAND}]]></variableExpression>
+	</variable>
+	<variable name="passkmpercentage" class="java.math.BigDecimal" resetType="Group" resetGroup="group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{PASS_KM_PERCENTAGE}]]></variableExpression>
+	</variable>
+	<variable name="earninginthous" class="java.math.BigDecimal" resetType="Group" resetGroup="group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{EARNINS_IN_THOUSAND}]]></variableExpression>
+	</variable>
+	<variable name="earningpercentage" class="java.math.BigDecimal" resetType="Group" resetGroup="group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{EARNINGS_PERCENTAGE}]]></variableExpression>
+	</variable>
+	<variable name="adoptedlead" class="java.math.BigDecimal" resetType="Group" resetGroup="group1" calculation="Sum">
+		<variableExpression><![CDATA[$F{ADOPTED_LEAD}]]></variableExpression>
+	</variable>
+	<variable name="adoptedperpass" class="java.math.BigDecimal" resetType="Group" resetGroup="group1" calculation="Sum">
+		<variableExpression><![CDATA[$V{adoptedperpass}]]></variableExpression>
+	</variable>
+	<variable name="totaladrate" class="java.math.BigDecimal" resetType="Group" resetGroup="group1">
+		<variableExpression><![CDATA[$F{TOTAL_AD_RATE_PASS}]]></variableExpression>
+	</variable>
+	<variable name="totaladoptedlead" class="java.math.BigDecimal" resetType="Group" resetGroup="group1">
+		<variableExpression><![CDATA[$F{TOTAL_ADOPTED_LEAD}]]></variableExpression>
+	</variable>
+	<group name="group1" isStartNewColumn="true" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{CLASS}]]></groupExpression>
+		<groupFooter>
+			<band height="74">
+				<textField hyperlinkType="None">
+					<reportElement x="577" y="29" width="53" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totaladrate}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="509" y="29" width="60" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{totaladoptedlead}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement isPrintRepeatedValues="false" x="447" y="29" width="53" height="20" printWhenGroupChanges="group1"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{earningpercentage}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement isPrintRepeatedValues="false" x="384" y="29" width="53" height="20" printWhenGroupChanges="group1"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{earninginthous}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement isPrintRepeatedValues="false" x="323" y="29" width="53" height="20" printWhenGroupChanges="group1"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{passkmpercentage}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement isPrintRepeatedValues="false" x="260" y="29" width="53" height="20" printWhenGroupChanges="group1"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{passkmthous}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement isPrintRepeatedValues="false" x="192" y="29" width="53" height="20" printWhenGroupChanges="group1"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{passpercentage}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement isPrintRepeatedValues="false" x="128" y="29" width="53" height="20" printWhenGroupChanges="group1"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{passunit}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement isPrintRepeatedValues="false" x="62" y="29" width="62" height="20" printWhenGroupChanges="group1"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{noofpassthous}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="3" y="29" width="53" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Total]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="3" y="4" width="754" height="20"/>
+					<textElement/>
+					<text><![CDATA[________________________________________________________________________________________________________________________________________]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="3" y="52" width="754" height="20"/>
+					<textElement/>
+					<text><![CDATA[________________________________________________________________________________________________________________________________________]]></text>
+				</staticText>
+			</band>
+		</groupFooter>
+	</group>
+	<pageHeader>
+		<band height="141">
+			<staticText>
+				<reportElement x="273" y="35" width="202" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[PASSENGER ZONE STATISTICS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="154" y="61" width="444" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11"/>
+				</textElement>
+				<text><![CDATA[For Non-Suburban(Ordinary i.e. Daily Tickets) Other Classes (including Executive Class)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="212" y="113" width="316" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11"/>
+				</textElement>
+				<text><![CDATA[(Excluding Military Traffic, Excess Fare Collection & Refund)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="641" y="9" width="55" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Page No:]]></text>
+			</staticText>
+			<textField hyperlinkType="None">
+				<reportElement x="700" y="9" width="46" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="10" y="103" width="32" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Class]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="640" y="37" width="42" height="19"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Date:]]></text>
+			</staticText>
+			<textField pattern="d/M/yy" hyperlinkType="None">
+				<reportElement x="685" y="37" width="61" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.util.Date"><![CDATA[new Date()]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="49" y="97" width="125" height="39"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="271" y="10" width="203" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ORGRLY_NAME}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="284" y="83" width="80" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{rptMonth}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="361" y="83" width="41" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{rptyear}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="99">
+			<staticText>
+				<reportElement x="3" y="29" width="60" height="44"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Distance
+Zone
+(in Kms.)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="67" y="29" width="60" height="44"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[No.of
+Pass.
+(in 000	)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="130" y="29" width="60" height="44"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[No.of
+Pass.
+(in units)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="193" y="29" width="60" height="44"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[% age
+To
+Total]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="256" y="29" width="60" height="44"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Passengers
+Kilometers
+(in 000)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="320" y="29" width="60" height="44"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[% age
+To
+Total]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="383" y="29" width="60" height="44"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Earning
+(in 000)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="446" y="29" width="60" height="44"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[%age
+To
+Total]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="510" y="29" width="60" height="44"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Adopted
+Lead]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="573" y="29" width="60" height="44"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Ad.Rate
+per pass
+(in Rupees	)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="636" y="29" width="57" height="44"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Pass.
+Tarrif
+Rate
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="697" y="29" width="60" height="44"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[% age
+Variation
+11 over 10]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="8" width="754" height="20"/>
+				<textElement/>
+				<text><![CDATA[________________________________________________________________________________________________________________________________________]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="75" width="754" height="20"/>
+				<textElement/>
+				<text><![CDATA[________________________________________________________________________________________________________________________________________]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="28">
+			<textField hyperlinkType="None">
+				<reportElement x="3" y="4" width="56" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{DISTRANGE}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="63" y="4" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{PASS_THOUSAND}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="128" y="4" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{PASS_UNITS}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="193" y="4" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{PASS_PERCENTAGE}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="259" y="4" width="56" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{PASS_KM_THOUSAND}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="321" y="4" width="58" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{PASS_KM_PERCENTAGE}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="383" y="4" width="58" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{EARNINS_IN_THOUSAND}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="445" y="4" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{EARNINGS_PERCENTAGE}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="511" y="4" width="59" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{ADOPTED_LEAD}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="575" y="4" width="56" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{AD_RATE_PASS}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

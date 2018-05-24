@@ -1,0 +1,508 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created using an evaluation version of JasperAssistant (http://www.jasperassistant.com) -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Unnamed" pageWidth="1430" pageHeight="842" columnWidth="1390" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30">
+	<property name="com.jasperassistant.designer.Grid" value="false"/>
+	<property name="com.jasperassistant.designer.SnapToGrid" value="false"/>
+	<property name="com.jasperassistant.designer.GridWidth" value="12"/>
+	<property name="com.jasperassistant.designer.GridHeight" value="12"/>
+	<property name="com.jasperassistant.designer.DataSource" value="tams_153"/>
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+	<parameter name="zone" class="java.lang.String">
+		<defaultValueExpression><![CDATA["CR"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="rptMonth" class="java.lang.String">
+		<defaultValueExpression><![CDATA["December"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="rptyear" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2017"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select distinct 
+case 
+when  a.orgrly = 'CR'  	then 'Central Railway'
+when  a.orgrly = 'ER'  	then 'Eastern Railway'
+when  a.orgrly = 'EC'  	then 'East Central Railway'
+when  a.orgrly = 'EO' 	then 'East Coast Railway'
+when  a.orgrly = 'KR'  	then 'Konkan Railway'
+when  a.orgrly = 'NC'  then 'North Central Railway'
+when  a.orgrly = 'NE'  	then 'North Eastern Railway'
+when  a.orgrly = 'NF'  then 'North Frontier Railway'
+when  a.orgrly = 'NR'  then 'Northern Railway'
+when  a.orgrly = 'NW' then 'North Western Railway'
+when  a.orgrly = 'SB'  	then 'South East Central Railway'
+when  a.orgrly = 'SC'  then 'South Central Railway'
+when  a.orgrly = 'SE'  	then 'South Eastern Railway'
+when  a.orgrly = 'SR'  	then 'Southern Railway'
+when  a.orgrly = 'SW'  then 'South Western Railway'
+when  a.orgrly = 'WC' then 'West Central Railway'
+when  a.orgrly = 'WR'  then 'Western  Railway'
+end orgrly,
+
+a.station_from,a.station_from_code,a.station_upto,a.station_to_code,
+a.via1,a.via2,a.via3,a.via4,
+a.distance,b.total_distance,
+round(a.CRAPPR*b.total_distance/100,0) CR,
+round(a.NRAPPR*b.total_distance/100,0) NR,
+round(a.WRAPPR*b.total_distance/100,0) WR,
+round(a.ERAPPR*b.total_distance/100,0) ER,
+round(a.SRAPPR*b.total_distance/100,0) SR,
+round(a.NCRAPPR*b.total_distance/100,0) NC,
+round(a.WCRAPPR*b.total_distance/100,0) WC,
+round(a.ECRAPPR*b.total_distance/100,0) EC, 
+round(a.SCRAPPR*b.total_distance/100,0) SC,
+round(a.NERAPPR*b.total_distance/100,0) NE,
+round(a.NFRAPPR*b.total_distance/100,0) NF,
+round(a.KRAPPR*b.total_distance/100,0) KR,
+round(a.SECRAPPR*b.total_distance/100,0) SB,
+round(a.SERAPPR*b.total_distance/100,0) SE,
+round(a.NWRAPPR*b.total_distance/100,0) NW,
+round(a.SWRAPPR*b.total_distance/100,0) SW,
+round(a.ECORAPPR*b.total_distance/100,0) EO
+from taedapprutsdec a,taedapprutssd b 
+where a.station_from = b.station_from and b.station_upto = a.station_upto 
+and b.via1 = a.via1 and b.via2 = a.via2 and b.via3 = a.via3 and b.via4 = a.via4
+and b.zoneapporupdate = 'Y' and a.apprcnf_flag = 'Y'  and a.local_foreign_id = 'F' 
+and a.orgrly = $P{zone} 
+
+
+order by a.station_from,a.station_upto,a.via1,a.via2,a.via3,a.via4]]>
+	</queryString>
+	<field name="CR" class="java.math.BigDecimal"/>
+	<field name="DISTANCE" class="java.math.BigDecimal"/>
+	<field name="EC" class="java.math.BigDecimal"/>
+	<field name="EO" class="java.math.BigDecimal"/>
+	<field name="ER" class="java.math.BigDecimal"/>
+	<field name="KR" class="java.math.BigDecimal"/>
+	<field name="NC" class="java.math.BigDecimal"/>
+	<field name="NE" class="java.math.BigDecimal"/>
+	<field name="NF" class="java.math.BigDecimal"/>
+	<field name="NR" class="java.math.BigDecimal"/>
+	<field name="NW" class="java.math.BigDecimal"/>
+	<field name="ORGRLY" class="java.lang.String"/>
+	<field name="SB" class="java.math.BigDecimal"/>
+	<field name="SC" class="java.math.BigDecimal"/>
+	<field name="SE" class="java.math.BigDecimal"/>
+	<field name="SR" class="java.math.BigDecimal"/>
+	<field name="STATION_FROM" class="java.lang.String"/>
+	<field name="STATION_FROM_CODE" class="java.math.BigDecimal"/>
+	<field name="STATION_TO_CODE" class="java.math.BigDecimal"/>
+	<field name="STATION_UPTO" class="java.lang.String"/>
+	<field name="SW" class="java.math.BigDecimal"/>
+	<field name="TOTAL_DISTANCE" class="java.math.BigDecimal"/>
+	<field name="VIA1" class="java.lang.String"/>
+	<field name="VIA2" class="java.lang.String"/>
+	<field name="VIA3" class="java.lang.String"/>
+	<field name="VIA4" class="java.lang.String"/>
+	<field name="WC" class="java.math.BigDecimal"/>
+	<field name="WR" class="java.math.BigDecimal"/>
+	<title>
+		<band height="114">
+			<staticText>
+				<reportElement x="747" y="13" width="53" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[(UTS)]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="355" y="46" width="581" height="20"/>
+				<textElement textAlignment="Center">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Break Up Of Zone wise Distances Between Any Two Stations Of UTS Summary
+]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1015" y="17" width="101" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[DATE OF REPORT:]]></text>
+			</staticText>
+			<textField pattern="d/M/yy" hyperlinkType="None">
+				<reportElement x="1116" y="17" width="80" height="19"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.util.Date"><![CDATA[new Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="1103" y="50" width="94" height="20"/>
+				<textElement/>
+				<text><![CDATA[DISTANCE IN KMS]]></text>
+			</staticText>
+			<textField hyperlinkType="None">
+				<reportElement x="524" y="13" width="221" height="20"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ORGRLY}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="669" y="77" width="80" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{rptMonth}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="748" y="77" width="42" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{rptyear}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<columnHeader>
+		<band height="28">
+			<staticText>
+				<reportElement x="4" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[STATION
+ FORM]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="106" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[STATION 
+TO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="412" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[RLY 
+DISTANCE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="463" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[TOTAL 
+DISTANCE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="514" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[CR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="565" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[NR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="616" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[WR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="667" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="718" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[SR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="769" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[NC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="820" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[WC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="871" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[EC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="922" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[SC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="973" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[NE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1024" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[NF]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1075" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[KR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1126" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[SB]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1177" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[SE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1228" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[NW]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1279" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[SW]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1330" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[EO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="55" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[FROM 
+CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="157" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[UPTO
+CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="208" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[VIA1]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="259" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[VIA2]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="310" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[VIA3]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="361" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[VIA4]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="28">
+			<textField hyperlinkType="None">
+				<reportElement x="3" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{STATION_FROM}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="105" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{STATION_UPTO}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="411" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{DISTANCE}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="462" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{TOTAL_DISTANCE}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="513" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{CR}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="564" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NR}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="615" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{WR}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="666" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{ER}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="717" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{SR}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="768" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NC}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="819" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{WC}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="870" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{EC}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="921" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{SC}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="972" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NE}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="1023" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NF}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="1074" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{KR}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="1125" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{SB}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="1176" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{SE}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="1227" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NW}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="1278" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{SW}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="1329" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{EO}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="54" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{STATION_FROM_CODE}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="156" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{STATION_TO_CODE}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="207" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{VIA1}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="258" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{VIA2}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="309" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{VIA3}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="360" y="0" width="51" height="28"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{VIA4}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="50">
+			<textField hyperlinkType="None">
+				<reportElement x="716" y="15" width="49" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="648" y="15" width="64" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Page No]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+</jasperReport>

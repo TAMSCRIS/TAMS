@@ -1,0 +1,613 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created using an evaluation version of JasperAssistant (http://www.jasperassistant.com) -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Unnamed" pageWidth="1420" pageHeight="842" columnWidth="1380" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30">
+	<property name="com.jasperassistant.designer.DataSource" value="tams_153"/>
+	<property name="com.jasperassistant.designer.Grid" value="false"/>
+	<property name="com.jasperassistant.designer.SnapToGrid" value="false"/>
+	<property name="com.jasperassistant.designer.GridWidth" value="12"/>
+	<property name="com.jasperassistant.designer.GridHeight" value="12"/>
+	<property name="net.sf.jasperreports.print.keep.full.text" value="true"/>
+<property name="net.sf.jasperreports.export.xls.wrap.text" value="false"/>
+	<parameter name="zone" class="java.lang.String">
+		<defaultValueExpression><![CDATA["CR"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="rptMonth" class="java.lang.String">
+		<defaultValueExpression><![CDATA["December"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="rptyear" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2017"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select 
+case
+when  b.orgrly= 'CR'  	then 'Central Railway'
+when  b.orgrly= 'ER'  	then 'Eastern Railway'
+when  b.orgrly= 'EC'  	then 'East Central Railway'
+when  b.orgrly= 'EO' 	then 'East Coast Railway'
+when  b.orgrly= 'KR'  	then 'Konkan Railway'
+when  b.orgrly= 'NC'  then 'North Central Railway'
+when  b.orgrly= 'NE'  	then 'North Eastern Railway'
+when  b.orgrly= 'NF'  then 'North Frontier Railway'
+when  b.orgrly= 'NR'  then 'Northern Railway'
+when  b.orgrly= 'NW' then 'North Western Railway'
+when  b.orgrly= 'SB'  	then 'South East Central Railway'
+when  b.orgrly= 'SC'  then 'South Central Railway'
+when  b.orgrly= 'SE'  	then 'South Eastern Railway'
+when  b.orgrly= 'SR'  	then 'Southern Railway'
+when  b.orgrly= 'SW'  then 'South Western Railway'
+when  b.orgrly= 'WC' then 'West Central Railway'
+when  b.orgrly='WR'  then 'Western  Railway'
+
+end orgrly ,
+a.dstnrly dstnrly , a.FROM_GUAGE FROM_GUAGE,  a.Records Records, a.Amount Amount,a.CR CR, a.EC EC, a.EO EO,a.ER ER, a.KR KR,
+a.NC NC, a.NE NE, a.NF NF, a.NR NR, a.NW NW,a.SB SB, a.SC SC, a.SE SE, a.SR SR, a.SW SW,a.WC WC, a.WR WR,
+a.Total_shared Total_shared,a.Diff Diff
+
+from
+(
+
+select dstnrly , FROM_GUAGE , count(*) Records,round(sum(APPR_AMOUNT),0) Amount,
+round(sum(CRAPVA),0) CR,round(sum(ECRAPVA),0) EC,round(sum(ECORAPVA),0) EO,round(sum(ERAPVA),0) ER,round(sum(KRAPVA),0) KR,
+round(sum(NCRAPVA),0)NC,round(sum(NERAPVA),0) NE,round(sum(NFRAPVA),0) NF,round(sum(NRAPVA),0) NR,round(sum(NWRAPVA),0) NW,
+round(sum(SECRAPVA),0) SB,round(sum(SCRAPVA),0) SC,round(sum(SERAPVA),0) SE,round(sum(SRAPVA),0) SR,round(sum(SWRAPVA),0) SW,
+round(sum(WCRAPVA),0) WC,round(sum(WRAPVA),0) WR,
+round(sum(CRAPVA+ECORAPVA+ECRAPVA+KRAPVA+NCRAPVA+NERAPVA+NFRAPVA+NRAPVA+NWRAPVA+SCRAPVA+
+SECRAPVA+SRAPVA+SWRAPVA+WCRAPVA+WRAPVA+ERAPVA+SERAPVA),0) Total_shared,
+round(sum(APPR_AMOUNT),0) - round(sum(CRAPVA+ECORAPVA+ECRAPVA+KRAPVA+NCRAPVA+NERAPVA+NFRAPVA+NRAPVA+NWRAPVA+SCRAPVA+
+SECRAPVA+SRAPVA+SWRAPVA+WCRAPVA+WRAPVA+ERAPVA+SERAPVA),0) Diff
+from taedapprutsdec 
+where orgrly = $P{zone}  and local_foreign_id = 'L' 
+and FROM_GUAGE in ('B','M','N') and to_guage in ('B','M','N') and from_guage =to_guage and dstnrly is not null
+group by dstnrly ,FROM_GUAGE 
+union
+select distinct dstnrly,FROM_GUAGE,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+from taedapprutsdec m where FROM_GUAGE in ('B','M','N') and dstnrly is not null and
+not exists (select * from 
+(select * from taedapprutsdec where orgrly = $P{zone}  and local_foreign_id = 'L' 
+and FROM_GUAGE in ('B','M','N') and to_guage in ('B','M','N') and from_guage =to_guage and dstnrly is not null ) n 
+where m.dstnrly = n.dstnrly and m.from_guage = n.from_guage)
+
+
+UNION 
+
+select '_TOTAL' as dstnrly , 'B' as FROM_GUAGE , count(*) Records,round(sum(APPR_AMOUNT),0) Amount,
+round(sum(CRAPVA),0) CR,round(sum(ECRAPVA),0) EC,round(sum(ECORAPVA),0) EO,round(sum(ERAPVA),0) ER,round(sum(KRAPVA),0) KR,
+round(sum(NCRAPVA),0)NC,round(sum(NERAPVA),0) NE,round(sum(NFRAPVA),0) NF,round(sum(NRAPVA),0) NR,round(sum(NWRAPVA),0) NW,
+round(sum(SECRAPVA),0) SB,round(sum(SCRAPVA),0) SC,round(sum(SERAPVA),0) SE,round(sum(SRAPVA),0) SR,round(sum(SWRAPVA),0) SW,
+round(sum(WCRAPVA),0) WC,round(sum(WRAPVA),0) WR,
+round(sum(CRAPVA+ECORAPVA+ECRAPVA+KRAPVA+NCRAPVA+NERAPVA+NFRAPVA+NRAPVA+NWRAPVA+SCRAPVA+
+SECRAPVA+SRAPVA+SWRAPVA+WCRAPVA+WRAPVA+ERAPVA+SERAPVA),0) Total_shared,
+round(sum(APPR_AMOUNT),0) - round(sum(CRAPVA+ECORAPVA+ECRAPVA+KRAPVA+NCRAPVA+NERAPVA+NFRAPVA+NRAPVA+NWRAPVA+SCRAPVA+
+SECRAPVA+SRAPVA+SWRAPVA+WCRAPVA+WRAPVA+ERAPVA+SERAPVA),0) Diff
+from taedapprutsdec 
+where orgrly = $P{zone}  and local_foreign_id = 'L' 
+and FROM_GUAGE in ('B') and to_guage in ('B') and from_guage =to_guage and dstnrly is not null
+
+
+UNION 
+
+select '_TOTAL' as dstnrly , 'M' as FROM_GUAGE , count(*) Records,round(sum(APPR_AMOUNT),0) Amount,
+round(sum(CRAPVA),0) CR,round(sum(ECRAPVA),0) EC,round(sum(ECORAPVA),0) EO,round(sum(ERAPVA),0) ER,round(sum(KRAPVA),0) KR,
+round(sum(NCRAPVA),0)NC,round(sum(NERAPVA),0) NE,round(sum(NFRAPVA),0) NF,round(sum(NRAPVA),0) NR,round(sum(NWRAPVA),0) NW,
+round(sum(SECRAPVA),0) SB,round(sum(SCRAPVA),0) SC,round(sum(SERAPVA),0) SE,round(sum(SRAPVA),0) SR,round(sum(SWRAPVA),0) SW,
+round(sum(WCRAPVA),0) WC,round(sum(WRAPVA),0) WR,
+round(sum(CRAPVA+ECORAPVA+ECRAPVA+KRAPVA+NCRAPVA+NERAPVA+NFRAPVA+NRAPVA+NWRAPVA+SCRAPVA+
+SECRAPVA+SRAPVA+SWRAPVA+WCRAPVA+WRAPVA+ERAPVA+SERAPVA),0) Total_shared,
+round(sum(APPR_AMOUNT),0) - round(sum(CRAPVA+ECORAPVA+ECRAPVA+KRAPVA+NCRAPVA+NERAPVA+NFRAPVA+NRAPVA+NWRAPVA+SCRAPVA+
+SECRAPVA+SRAPVA+SWRAPVA+WCRAPVA+WRAPVA+ERAPVA+SERAPVA),0) Diff
+from taedapprutsdec 
+where orgrly = $P{zone}  and local_foreign_id = 'L' 
+and FROM_GUAGE in ('M') and to_guage in ('M') and from_guage =to_guage and dstnrly is not null
+
+
+
+UNION 
+
+select '_TOTAL' as dstnrly ,'N' as  FROM_GUAGE , count(*) Records,round(sum(APPR_AMOUNT),0) Amount,
+round(sum(CRAPVA),0) CR,round(sum(ECRAPVA),0) EC,round(sum(ECORAPVA),0) EO,round(sum(ERAPVA),0) ER,round(sum(KRAPVA),0) KR,
+round(sum(NCRAPVA),0)NC,round(sum(NERAPVA),0) NE,round(sum(NFRAPVA),0) NF,round(sum(NRAPVA),0) NR,round(sum(NWRAPVA),0) NW,
+round(sum(SECRAPVA),0) SB,round(sum(SCRAPVA),0) SC,round(sum(SERAPVA),0) SE,round(sum(SRAPVA),0) SR,round(sum(SWRAPVA),0) SW,
+round(sum(WCRAPVA),0) WC,round(sum(WRAPVA),0) WR,
+round(sum(CRAPVA+ECORAPVA+ECRAPVA+KRAPVA+NCRAPVA+NERAPVA+NFRAPVA+NRAPVA+NWRAPVA+SCRAPVA+
+SECRAPVA+SRAPVA+SWRAPVA+WCRAPVA+WRAPVA+ERAPVA+SERAPVA),0) Total_shared,
+round(sum(APPR_AMOUNT),0) - round(sum(CRAPVA+ECORAPVA+ECRAPVA+KRAPVA+NCRAPVA+NERAPVA+NFRAPVA+NRAPVA+NWRAPVA+SCRAPVA+
+SECRAPVA+SRAPVA+SWRAPVA+WCRAPVA+WRAPVA+ERAPVA+SERAPVA),0) Diff
+from taedapprutsdec 
+where orgrly = $P{zone}  and local_foreign_id = 'L' 
+and FROM_GUAGE in ('N') and to_guage in ('N') and from_guage =to_guage and dstnrly is not null
+
+) a,
+
+(select $P{zone} as orgrly from dual ) b
+
+order by dstnrly ,FROM_GUAGE]]>
+	</queryString>
+	<field name="AMOUNT" class="java.math.BigDecimal"/>
+	<field name="CR" class="java.math.BigDecimal"/>
+	<field name="DIFF" class="java.math.BigDecimal"/>
+	<field name="DSTNRLY" class="java.lang.String"/>
+	<field name="EC" class="java.math.BigDecimal"/>
+	<field name="EO" class="java.math.BigDecimal"/>
+	<field name="ER" class="java.math.BigDecimal"/>
+	<field name="FROM_GUAGE" class="java.lang.String"/>
+	<field name="KR" class="java.math.BigDecimal"/>
+	<field name="NC" class="java.math.BigDecimal"/>
+	<field name="NE" class="java.math.BigDecimal"/>
+	<field name="NF" class="java.math.BigDecimal"/>
+	<field name="NR" class="java.math.BigDecimal"/>
+	<field name="NW" class="java.math.BigDecimal"/>
+	<field name="ORGRLY" class="java.lang.String"/>
+	<field name="RECORDS" class="java.math.BigDecimal"/>
+	<field name="SB" class="java.math.BigDecimal"/>
+	<field name="SC" class="java.math.BigDecimal"/>
+	<field name="SE" class="java.math.BigDecimal"/>
+	<field name="SR" class="java.math.BigDecimal"/>
+	<field name="SW" class="java.math.BigDecimal"/>
+	<field name="TOTAL_SHARED" class="java.math.BigDecimal"/>
+	<field name="WC" class="java.math.BigDecimal"/>
+	<field name="WR" class="java.math.BigDecimal"/>
+	<variable name="TAMOUNT" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{AMOUNT}]]></variableExpression>
+	</variable>
+	<variable name="TCR" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{CR}]]></variableExpression>
+	</variable>
+	<variable name="TEC" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{EC}]]></variableExpression>
+	</variable>
+	<variable name="TEO" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{EO}]]></variableExpression>
+	</variable>
+	<variable name="TER" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{ER}]]></variableExpression>
+	</variable>
+	<variable name="TKR" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{KR}]]></variableExpression>
+	</variable>
+	<variable name="TNC" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{NC}]]></variableExpression>
+	</variable>
+	<variable name="TNE" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{NE}]]></variableExpression>
+	</variable>
+	<variable name="TNF" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{NF}]]></variableExpression>
+	</variable>
+	<variable name="TNR" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{NR}]]></variableExpression>
+	</variable>
+	<variable name="TNW" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{NW}]]></variableExpression>
+	</variable>
+	<variable name="TSB" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{SB}]]></variableExpression>
+	</variable>
+	<variable name="TSC" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{SC}]]></variableExpression>
+	</variable>
+	<variable name="TSE" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{SE}]]></variableExpression>
+	</variable>
+	<variable name="TSR" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{SR}]]></variableExpression>
+	</variable>
+	<variable name="TSW" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{SW}]]></variableExpression>
+	</variable>
+	<variable name="TWC" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{WC}]]></variableExpression>
+	</variable>
+	<variable name="TWR" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{WR}]]></variableExpression>
+	</variable>
+	<variable name="TTOTALSHARED" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{TOTAL_SHARED}]]></variableExpression>
+	</variable>
+	<variable name="TDIFF" class="java.math.BigDecimal" resetType="Group" resetGroup="Group_1" calculation="Sum">
+		<variableExpression><![CDATA[$F{DIFF}]]></variableExpression>
+	</variable>
+	<group name="Group_1">
+		<groupExpression><![CDATA[$F{DSTNRLY}]]></groupExpression>
+		<groupHeader>
+			<band height="20">
+				<textField hyperlinkType="None">
+					<reportElement x="3" y="0" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{DSTNRLY}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="46">
+				<staticText>
+					<reportElement x="64" y="0" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[TOT CRDT]]></text>
+				</staticText>
+				<textField hyperlinkType="None">
+					<reportElement x="126" y="0" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TAMOUNT}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="188" y="0" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TCR}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="250" y="0" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TEC}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="312" y="0" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TEO}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="374" y="0" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TER}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="436" y="0" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TKR}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="498" y="0" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TNC}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="560" y="0" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TNE}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="622" y="0" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TNF}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="684" y="0" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TNR}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="746" y="1" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TNW}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="808" y="1" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TSB}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="870" y="1" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TSC}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="932" y="1" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TSE}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="994" y="1" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TSR}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="1056" y="1" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TSW}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="1118" y="1" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TWC}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="1180" y="1" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TWR}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="1242" y="1" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TTOTALSHARED}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="1304" y="1" width="62" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TDIFF}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="79">
+			<staticText>
+				<reportElement x="365" y="40" width="341" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[PASSENGER APPORTIONMENT OF UTS FOR THE MONTH OF]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="975" y="5" width="43" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Date:]]></text>
+			</staticText>
+			<textField pattern="M/d/yy" hyperlinkType="None">
+				<reportElement x="1023" y="6" width="57" height="19"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.util.Date"><![CDATA[new Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="968" y="35" width="118" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[FIGURES IN RUPEES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="845" y="35" width="114" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[FOR Local Traffic]]></text>
+			</staticText>
+			<textField hyperlinkType="None">
+				<reportElement x="707" y="40" width="80" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{rptMonth}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="788" y="40" width="50" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{rptyear}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="408" y="12" width="269" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ORGRLY}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="41">
+			<staticText>
+				<reportElement x="3" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[RLY TO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="65" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[GAUGE CODE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="127" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[AMOUNT]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="189" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[CR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="313" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[EO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="251" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[EC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="375" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[ER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="437" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[KR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="499" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[NC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="561" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[NE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1119" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[WC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="933" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[SE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="747" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[NW]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="685" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[NR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="623" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[NF]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1057" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[SW]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="871" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[SC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="809" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[SB]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="995" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[SR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1181" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[WR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1305" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[DIFF]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="1243" y="0" width="62" height="30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[TOTAL SHARED]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<detail>
+		<band height="20">
+			<textField hyperlinkType="None">
+				<reportElement x="64" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{FROM_GUAGE}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="126" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{AMOUNT}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="188" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{CR}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="250" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{EC}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="312" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{EO}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="374" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{ER}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="436" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{KR}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="498" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NC}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="560" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NE}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="622" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NF}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="684" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NR}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="746" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NW}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="808" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{SB}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="870" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{SC}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="932" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{SE}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="994" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{SR}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="1056" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{SW}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="1118" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{WC}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="1180" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{WR}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="1242" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{TOTAL_SHARED}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="1304" y="0" width="62" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{DIFF}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="50">
+			<textField hyperlinkType="None">
+				<reportElement x="532" y="14" width="33" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="476" y="14" width="56" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Page No:]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+</jasperReport>

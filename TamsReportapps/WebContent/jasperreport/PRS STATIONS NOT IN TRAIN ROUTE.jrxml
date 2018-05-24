@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created using an evaluation version of JasperAssistant (http://www.jasperassistant.com) -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Unnamed" pageWidth="650" pageHeight="842" columnWidth="610" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30">
+	<property name="com.jasperassistant.designer.Grid" value="false"/>
+	<property name="com.jasperassistant.designer.SnapToGrid" value="false"/>
+	<property name="com.jasperassistant.designer.GridWidth" value="12"/>
+	<property name="com.jasperassistant.designer.GridHeight" value="12"/>
+	<property name="com.jasperassistant.designer.DataSource" value="tams_153"/>
+	<parameter name="zone" class="java.lang.String">
+		<defaultValueExpression><![CDATA["CR"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="rptyear" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2018"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="rptMonth" class="java.lang.String">
+		<defaultValueExpression><![CDATA["January"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select distinct case 
+when  orgrly = 'CR'  	then 'Central Railway'
+when  orgrly = 'ER'  	then 'Eastern Railway'
+when  orgrly = 'EC'  	then 'East Central Railway'
+when  orgrly = 'EO' 	then 'East Coast Railway'
+when  orgrly = 'KR'  	then 'Konkan Railway'
+when  orgrly = 'NC'  then 'North Central Railway'
+when  orgrly = 'NE'  	then 'North Eastern Railway'
+when  orgrly = 'NF'  then 'North Frontier Railway'
+when  orgrly = 'NR'  then 'Northern Railway'
+when  orgrly = 'NW' then 'North Western Railway'
+when  orgrly = 'SB'  	then 'South East Central Railway'
+when  orgrly = 'SC'  then 'South Central Railway'
+when  orgrly = 'SE'  	then 'South Eastern Railway'
+when  orgrly = 'SR'  	then 'Southern Railway'
+when  orgrly = 'SW'  then 'South Western Railway'
+when  orgrly = 'WC' then 'West Central Railway'
+when  orgrly = 'WR'  then 'Western  Railway'
+
+
+end orgrly_name,trainno,sstn,sstn9,dstn,destn9 from taedapprprjan2018 where orgrly=$P{zone} and 
+apprcnf_flag is null   order by trainno,sstn,dstn]]>
+	</queryString>
+	<field name="DESTN9" class="java.lang.String"/>
+	<field name="DSTN" class="java.lang.String"/>
+	<field name="ORGRLY_NAME" class="java.lang.String"/>
+	<field name="SSTN" class="java.lang.String"/>
+	<field name="SSTN9" class="java.lang.String"/>
+	<field name="TRAINNO" class="java.lang.String"/>
+	<title>
+		<band height="144">
+			<staticText>
+				<reportElement x="43" y="25" width="85" height="15"/>
+				<textElement textAlignment="Center">
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[PROG:PUTSEC]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="43" y="48" width="110" height="17"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[REPORT:ERRORLIST]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="44" y="71" width="58" height="17"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[FOR:PRS]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="510" y="35" width="32" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Date:]]></text>
+			</staticText>
+			<textField pattern="d/M/yy" hyperlinkType="None">
+				<reportElement x="542" y="34" width="57" height="17"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.util.Date"><![CDATA[new Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="134" y="69" width="394" height="33"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[List of Stations not lying on the train route/List of Unmatch Trains.]]></text>
+			</staticText>
+			<textField hyperlinkType="None">
+				<reportElement x="179" y="34" width="300" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{ORGRLY_NAME}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="263" y="93" width="78" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[January]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="340" y="93" width="42" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[2018]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="25">
+			<staticText>
+				<reportElement x="484" y="6" width="34" height="15"/>
+				<textElement/>
+				<text><![CDATA[Page:]]></text>
+			</staticText>
+			<textField hyperlinkType="None">
+				<reportElement x="519" y="7" width="70" height="14"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="78">
+			<staticText>
+				<reportElement x="4" y="30" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Train_No]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="104" y="30" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[From_Station]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="207" y="30" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[From_Station_Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="309" y="30" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[To_Station]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="412" y="30" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[To_Station_Code]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="7" width="604" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[*********************************************************************************************************************************************************]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="55" width="604" height="20"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[*********************************************************************************************************************************************************]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="30">
+			<textField hyperlinkType="None">
+				<reportElement x="5" y="3" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{TRAINNO}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="106" y="3" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{SSTN}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="209" y="3" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{SSTN9}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="312" y="3" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{DSTN}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="414" y="3" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{SSTN9}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>

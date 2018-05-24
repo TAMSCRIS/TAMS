@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE struts PUBLIC
+"-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+"http://struts.apache.org/dtds/struts-2.0.dtd">
+
+
+<struts>
+
+
+
+
+	<package name="default" extends="struts-default">
+
+      
+
+		<action name="verifyaction" class="tams.action.tamsaction" method="execute">
+			<result name="success">/Jspforms/report.jsp</result>
+			<result name="error">/Jspforms/login.jsp</result>
+			
+			
+		</action>
+		
+		<action name="logout_action" class="tams.action.tamsaction" method="logout">
+			<result name="success">/Jspforms/login.jsp</result>
+			
+			
+		</action>
+		
+		
+		<action name="homeaction" class="tams.action.tamsaction" method="getyear">
+			<result name="success">/Jspforms/report.jsp</result>
+			
+		</action>
+
+		<action name="tamsmonthaction" class="tams.action.tamsaction" method="getmonth">
+			<result name="success">/Jspforms/report.jsp</result>
+		</action>
+
+		<action name="tamsearnaction" class="tams.action.tamsaction" method="getproject">
+			<result name="success">/Jspforms/report.jsp</result>
+		</action>
+
+		<action name="tamsreportaction" class="tams.action.tamsaction"
+			method="getreport">
+			<result name="success">/Jspforms/report.jsp</result>
+		</action>
+		<action name="tamsrlyaction" class="tams.action.tamsaction"
+			method="getrlyreport">
+			<result name="success">/Jspforms/report.jsp</result>
+		</action>
+
+		<action name="tamsconvertaction" class="tams.action.tamsaction"
+			method="getconverttamsReport">
+			<result name="success">/Jspforms/report.jsp</result>
+		</action>
+
+	  <action name="downloaddata" class="tams.action.generatereport" method="generateRpt">
+		<result name="success" >/Jspforms/report.jsp</result>  
+		</action> 
+		
+		<action name="generateaction" class="tams.action.Viewdata"  >
+		<result name="successed" >/Jspforms/prsstnnotintrainroute.jsp</result>
+		<result name="success" >/Jspforms/viewreportdata.jsp</result>
+		<result name="successedfound" >/Jspforms/matchunmatchreport.jsp</result>
+		<result name="successsfind" >/Jspforms/cateringmatrix.jsp</result>
+		<result name="successview" >/Jspforms/apportionmentmatrix.jsp</result>
+		<result name="successviewed" >/Jspforms/UTS_Apportionment_matrix_report.jsp</result>
+		<result name="successedfounded" >/Jspforms/Utsmatchunmatchreport.jsp</result>
+		<result name="successfound" >/Jspforms/UtsBookingwiseMatchUnmatch.jsp</result>
+		<result name="getsuccess" >/Jspforms/utsdetailsofmutpmmtsplateform.jsp</result>
+		<result name="successget" >/Jspforms/UTS_Unmatched_OD_pairs.jsp</result>
+		
+		<result name="success_PRS_PRTN" >/Jspforms/PRS_PRTNFILE_REPORT.jsp</result>
+		<result name="success_UTS_PRTN" >/Jspforms/UTS_PRTNFILE_REPORT.jsp</result>
+		
+		
+			
+		</action> 
+	
+	</package>
+</struts>

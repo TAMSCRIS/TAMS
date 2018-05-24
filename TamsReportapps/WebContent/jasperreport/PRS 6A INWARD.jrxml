@@ -1,0 +1,390 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created using an evaluation version of JasperAssistant (http://www.jasperassistant.com) -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Unnamed" pageWidth="750" pageHeight="842" columnWidth="710" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30">
+	<property name="com.jasperassistant.designer.DataSource" value="tams_153"/>
+	<property name="com.jasperassistant.designer.Grid" value="false"/>
+	<property name="com.jasperassistant.designer.SnapToGrid" value="false"/>
+	<property name="com.jasperassistant.designer.GridWidth" value="12"/>
+	<property name="com.jasperassistant.designer.GridHeight" value="12"/>
+	<parameter name="zone" class="java.lang.String">
+		<defaultValueExpression><![CDATA["CR"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="rptMonth" class="java.lang.String">
+		<defaultValueExpression><![CDATA["December"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="rptyear" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2017"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select case when a.orgrly = 'CR' then 'CENTRAL RAILWAY' 
+            when a.orgrly = 'EC' then 'EAST CENTRAL RAILWAY' 
+            when a.orgrly = 'EO' then 'EAST COAST RAILWAY'
+            when a.orgrly = 'ER' then 'EASTERN RAILWAY' 
+            when a.orgrly = 'KR' then 'KONKAN RAILWAY' 
+            when a.orgrly = 'NC' then 'NORTH CENTRAL RAILWAY' 
+            when a.orgrly = 'NE' then 'NORTH EASTERN RAILWAY' 
+            when a.orgrly = 'NF' then 'NORTH FRONTIER RAILWAY' 
+            when a.orgrly = 'NR' then 'NORTHERN RAILWAY' 
+            when a.orgrly = 'NW' then 'NORTH WESTERN RAILWAY' 
+            when a.orgrly = 'SB' then 'SOUTH EAST CENTRAL RAILWAY' 
+            when a.orgrly = 'SC' then 'SOUTH CENTRAL RAILWAY' 
+            when a.orgrly = 'SE' then 'SOUTH EASTERN RAILWAY' 
+            when a.orgrly = 'SR' then 'SOUTHERN  RAILWAY' 
+            when a.orgrly = 'SW' then 'SOUTH WESTERN RAILWAY' 
+            when a.orgrly = 'WC' then 'WEST CENTRAL RAILWAY' 
+            when a.orgrly = 'WR' then 'WESTERN RAILWAY' 
+      end orgrly,
+      case when a.to_guage = 'B' then 'BROAD GAUGE' 
+          when a.to_guage = 'M' then 'METER GAUGE' 
+          when a.to_guage = 'N' then 'NARROW GAUGE' 
+      end to_guage,
+a.inward_item_flag inward_item_flag,a.description description,to_number(a.class_code) class_code,b.sub_item_name sub_item_name,
+0 as SUBURBAN_SEASON,0 as SUBURBAN_ORDINARY,0 as NONSUBURBAN_SEASON,round(a.nonsuburban_ordinary,0) nonsuburban_ordinary
+,round(a.nonsuburban_ordinary,0) as Total
+from 
+
+(
+select 1 as item_flag ,1 as inward_item_flag,'(A) PASSENGERS ORIGINATING' as description ,a.orgrly orgrly,a.ORGG to_guage,a.class class_code,
+0 as suburban_season,0 as suburban_ordinary,0 as Nonsuburban_season,0 as Nonsuburban_ordinary,
+12 as month,($P{rptyear}) as year ,'PRS' as project
+
+from taedapprprdec a
+group by orgrly,ORGG,class
+
+
+
+union
+
+select 1 as item_flag ,2 as inward_item_flag,'(B) PASSENGERS TRANSHIPPED' as description ,a.orgrly orgrly,a.ORGG to_guage,a.class class_code,
+0 as suburban_season,0 as suburban_ordinary, 0 as Nonsuburban_season,0 as Nonsuburban_ordinary,
+12 as month,($P{rptyear}) as year ,'PRS' as project
+ 
+from taedapprprdec a
+group by orgrly,ORGG,class
+
+
+
+
+union
+
+select 1 as item_flag ,3 as inward_item_flag,'(C) PASSENGER   RECEIVED' as description ,a.orgrly orgrly,a.ORGG to_guage,a.class class_code,
+0 as suburban_season,0 as suburban_ordinary, 0 as Nonsuburban_season,a.Nonsuburban_ordinary,
+12 as month,($P{rptyear}) as year ,'PRS' as project
+from 
+
+(
+select  orgrly,ORGG,class, sum(tpass) Nonsuburban_ordinary 
+from taedapprprdec  
+where wrappr >0 and orgrly not in ($P{zone}) 
+group by orgrly,ORGG,class  
+
+union
+
+select distinct orgrly,ORGG,class, 0 as Nonsuburban_ordinary
+from taedapprprdec m where not exists 
+(select * from ( select * from taedapprprdec  where wrappr >0 and orgrly not in ($P{zone}) ) n 
+ where m.orgrly = n.orgrly and m.ORGG = n.ORGG and m.class = n.class)
+ group by orgrly,ORGG,class
+
+)  a
+
+
+
+union
+
+select 1 as item_flag ,4 as inward_item_flag,'(D) PASSENGERS CARRIED' as description ,a.orgrly orgrly,a.ORGG to_guage,a.class class_code,
+0 as suburban_season,0 as suburban_ordinary, 0 as Nonsuburban_season,a.Nonsuburban_ordinary,
+12 as month,($P{rptyear}) as year ,'PRS' as project
+from 
+
+(
+select  orgrly,ORGG,class, sum(tpass) Nonsuburban_ordinary 
+from taedapprprdec  
+where wrappr >0 and orgrly not in ($P{zone})
+group by orgrly,ORGG,class  
+
+union
+
+select distinct orgrly,ORGG,class, 0 as Nonsuburban_ordinary
+from taedapprprdec m where not exists 
+(select * from ( select * from taedapprprdec  where wrappr >0 and orgrly not in ($P{zone})) n 
+ where m.orgrly = n.orgrly and m.ORGG = n.ORGG and m.class = n.class)
+ group by orgrly,ORGG,class
+
+)  a
+
+
+
+
+union
+
+select 1 as item_flag ,5 as inward_item_flag,'(E) PASSENGERS EARNINGS (In Rupees)' as description ,a.orgrly orgrly,a.ORGG to_guage,a.class class_code,
+0 as suburban_season,0 as suburban_ordinary, 0 as Nonsuburban_season,a.Nonsuburban_ordinary,
+12 as month,($P{rptyear}) as year ,'PRS' as project
+from 
+
+(
+select  orgrly,ORGG,class, sum((tfare*wrappr)/100) Nonsuburban_ordinary 
+from taedapprprdec  
+where wrappr >0 and orgrly not in ($P{zone})
+group by orgrly,ORGG,class  
+
+union
+
+select distinct orgrly,ORGG,class, 0 as Nonsuburban_ordinary
+from taedapprprdec m where not exists 
+(select * from ( select * from taedapprprdec  where wrappr >0 and orgrly not in ($P{zone})) n 
+ where m.orgrly = n.orgrly and m.ORGG = n.ORGG and m.class = n.class)
+ group by orgrly,ORGG,class
+
+)  a
+
+
+
+
+union
+
+select 1 as item_flag ,6 as inward_item_flag,'(F) PASSENGERS KILOMETERS (In KM)' as description ,a.orgrly orgrly,a.ORGG to_guage,a.class class_code,
+0 as suburban_season,0 as suburban_ordinary, 0 as Nonsuburban_season,a.Nonsuburban_ordinary,
+12 as month,($P{rptyear}) as year ,'PRS' as project
+from 
+
+(
+select  orgrly,ORGG,class, sum(tpass *((dist*wrappr)/100) ) Nonsuburban_ordinary 
+from taedapprprdec  
+where wrappr >0 and orgrly not in ($P{zone})
+group by orgrly,ORGG,class  
+
+union
+
+select distinct orgrly,ORGG,class, 0 as Nonsuburban_ordinary
+from taedapprprdec m where not exists 
+(select * from ( select * from taedapprprdec  where wrappr >0 and orgrly not in ($P{zone})) n 
+ where m.orgrly = n.orgrly and m.ORGG = n.ORGG and m.class = n.class)
+ group by orgrly,ORGG,class
+
+)  a
+
+
+
+
+
+
+) a,
+
+
+statement6aclass b 
+where a.project = 'PRS' and a.year = ($P{rptyear}) and a.month = 12 and a.to_guage in ('B','M','N')  and a.item_flag in (1) and b.project = 'PRS'
+and a.item_flag = b.item_flag and a.class_code = b.class_code
+
+order by orgrly,to_guage,inward_item_flag,to_number(class_code)]]>
+	</queryString>
+	<field name="CLASS_CODE" class="java.math.BigDecimal"/>
+	<field name="DESCRIPTION" class="java.lang.String"/>
+	<field name="INWARD_ITEM_FLAG" class="java.math.BigDecimal"/>
+	<field name="NONSUBURBAN_ORDINARY" class="java.math.BigDecimal"/>
+	<field name="NONSUBURBAN_SEASON" class="java.math.BigDecimal"/>
+	<field name="ORGRLY" class="java.lang.String"/>
+	<field name="SUBURBAN_ORDINARY" class="java.math.BigDecimal"/>
+	<field name="SUBURBAN_SEASON" class="java.math.BigDecimal"/>
+	<field name="SUB_ITEM_NAME" class="java.lang.String"/>
+	<field name="TOTAL" class="java.math.BigDecimal"/>
+	<field name="TO_GUAGE" class="java.lang.String"/>
+	<group name="Group_1" isStartNewColumn="true" isStartNewPage="true">
+		<groupExpression><![CDATA[$F{ORGRLY}]]></groupExpression>
+		<groupHeader>
+			<band height="98">
+				<textField pattern="M/d/yy" hyperlinkType="None">
+					<reportElement x="568" y="3" width="39" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+					<textFieldExpression class="java.util.Date"><![CDATA[new Date()]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="532" y="3" width="38" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[Date -]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="4" y="34" width="556" height="39"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font isBold="false"/>
+					</textElement>
+					<text><![CDATA[CRIS PASSENGER REVENUE STATISTICS STATEMENT 6A 
+ Note: *(Other than PRS Application, all other passenger application 6A statement pertained to Unreserved passenger only)]]></text>
+				</staticText>
+				<textField>
+					<reportElement x="423" y="37" width="55" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{rptMonth}]]></textFieldExpression>
+				</textField>
+				<textField>
+					<reportElement x="471" y="39" width="43" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle">
+						<font size="10" isBold="true"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$P{rptyear}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="168" y="10" width="141" height="22"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="14"/>
+					</textElement>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{ORGRLY_NAME}]]></textFieldExpression>
+				</textField>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="50"/>
+		</groupFooter>
+	</group>
+	<group name="Group_2">
+		<groupExpression><![CDATA[$F{TO_GUAGE}]]></groupExpression>
+		<groupHeader>
+			<band height="31">
+				<textField hyperlinkType="None">
+					<reportElement x="433" y="0" width="151" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{TO_GUAGE}]]></textFieldExpression>
+				</textField>
+				<textField hyperlinkType="None">
+					<reportElement x="213" y="1" width="208" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{ORGRLY}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="111" y="1" width="97" height="20"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[FROM RAILWAY ]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="50"/>
+		</groupFooter>
+	</group>
+	<group name="Group_3">
+		<groupExpression><![CDATA[$F{INWARD_ITEM_FLAG}]]></groupExpression>
+		<groupHeader>
+			<band height="99">
+				<staticText>
+					<reportElement x="531" y="71" width="104" height="28"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[TOTAL]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="427" y="71" width="104" height="28"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[NONSUBURBAN
+ORDINARY]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="323" y="71" width="104" height="28"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[NONSUBURBAN
+SEASON]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="219" y="71" width="104" height="28"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[SUBURBAN
+ORDINARY]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="115" y="71" width="104" height="28"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[SUBURBAN
+SEASON]]></text>
+				</staticText>
+				<staticText>
+					<reportElement x="11" y="71" width="104" height="28"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[CLASS]]></text>
+				</staticText>
+				<textField hyperlinkType="None">
+					<reportElement x="93" y="6" width="427" height="30"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+					<textFieldExpression class="java.lang.String"><![CDATA[$F{DESCRIPTION}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement x="93" y="37" width="427" height="21"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle"/>
+					<text><![CDATA[-----------------------------------------------------------------------------------------------]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="50"/>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="28">
+			<staticText>
+				<reportElement x="97" y="3" width="326" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[PRS 6A INWARD REPORT]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="39">
+			<textField hyperlinkType="None">
+				<reportElement x="115" y="0" width="104" height="39"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{SUBURBAN_SEASON}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="11" y="0" width="104" height="39"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{SUB_ITEM_NAME}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="219" y="0" width="104" height="39"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{SUBURBAN_ORDINARY}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="427" y="0" width="104" height="39"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NONSUBURBAN_ORDINARY}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="323" y="0" width="104" height="39"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{NONSUBURBAN_SEASON}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="531" y="0" width="104" height="39"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{TOTAL}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="50">
+			<textField evaluationTime="Report" hyperlinkType="None">
+				<reportElement x="349" y="15" width="26" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="335" y="15" width="14" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[/]]></text>
+			</staticText>
+			<textField hyperlinkType="None">
+				<reportElement x="312" y="15" width="23" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="232" y="15" width="80" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[PAGE NO - ]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+</jasperReport>

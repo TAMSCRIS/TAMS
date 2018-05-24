@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created using an evaluation version of JasperAssistant (http://www.jasperassistant.com) -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Unnamed" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="30" bottomMargin="30">
+	<property name="com.jasperassistant.designer.DataSource" value="tams_153"/>
+	<property name="com.jasperassistant.designer.Grid" value="false"/>
+	<property name="com.jasperassistant.designer.SnapToGrid" value="false"/>
+	<property name="com.jasperassistant.designer.GridWidth" value="12"/>
+	<property name="com.jasperassistant.designer.GridHeight" value="12"/>
+	<parameter name="zone" class="java.lang.String">
+		<defaultValueExpression><![CDATA["CR"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="rptyear" class="java.lang.String">
+		<defaultValueExpression><![CDATA["2018"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="rptMonth" class="java.lang.String">
+		<defaultValueExpression><![CDATA["January"]]></defaultValueExpression>
+	</parameter>
+	<queryString>
+		<![CDATA[select row_number() over ( order by trainno ) as S_NO,a.trainno trainno,a.catchg catchg,a.ownrly_name ownrly_name
+from 
+(
+select  trainno,sum(to_number(na)) catchg,
+case 
+when  ownrly = 'CR'  	then 'Central Railway'
+when  ownrly = 'ER'  	then 'Eastern Railway'
+when  ownrly = 'EC'  	then 'East Central Railway'
+when  ownrly = 'EO' 	then 'East Coast Railway'
+when  ownrly = 'KR'  	then 'Konkan Railway'
+when  ownrly = 'NC'  then 'North Central Railway'
+when  ownrly = 'NE'  	then 'North Eastern Railway'
+when  ownrly = 'NF'  then 'North Frontier Railway'
+when  ownrly = 'NR'  then 'Northern Railway'
+when  ownrly = 'NW' then 'North Western Railway'
+when  ownrly = 'SB'  	then 'South East Central Railway'
+when  ownrly = 'SC'  then 'South Central Railway'
+when  ownrly = 'SE'  	then 'South Eastern Railway'
+when  ownrly = 'SR'  	then 'Southern Railway'
+when  ownrly = 'SW'  then 'South Western Railway'
+when  ownrly = 'WC' then 'West Central Railway'
+when  ownrly = 'WR'  then 'Western  Railway'
+
+end ownrly_name
+
+from  taedapprprjan2018  where ownrly =$P{zone}  group by ownrly ,trainno 
+) a
+where a.catchg <> 0
+order by a.trainno]]>
+	</queryString>
+	<field name="CATCHG" class="java.math.BigDecimal"/>
+	<field name="OWNRLY_NAME" class="java.lang.String"/>
+	<field name="S_NO" class="java.math.BigDecimal"/>
+	<field name="TRAINNO" class="java.lang.String"/>
+	<variable name="TotalCatchg" class="java.math.BigDecimal" calculation="Sum">
+		<variableExpression><![CDATA[$F{CATCHG}]]></variableExpression>
+	</variable>
+	<title>
+		<band height="135">
+			<staticText>
+				<reportElement x="135" y="31" width="276" height="97"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[Trains Owning Railway wise
+
+(PRS) Catering Charges Report
+(Amount in units)
+
+]]></text>
+			</staticText>
+			<textField pattern="d/M/yy" hyperlinkType="None">
+				<reportElement x="477" y="27" width="56" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.util.Date"><![CDATA[new Date()]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="442" y="27" width="35" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Date :]]></text>
+			</staticText>
+			<textField hyperlinkType="None">
+				<reportElement x="209" y="97" width="80" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{rptMonth}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="280" y="97" width="41" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{rptyear}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="136" y="5" width="275" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{OWNRLY_NAME}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="21">
+			<staticText>
+				<reportElement x="442" y="2" width="49" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Page No :]]></text>
+			</staticText>
+			<textField hyperlinkType="None">
+				<reportElement x="491" y="3" width="37" height="16"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="58">
+			<staticText>
+				<reportElement x="3" y="19" width="80" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[S.No.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="148" y="19" width="80" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Train Number]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="293" y="19" width="93" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Catering Charges]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="3" y="4" width="539" height="15"/>
+				<textElement/>
+				<text><![CDATA[********************************************************************************************************************************************]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="2" y="40" width="539" height="15"/>
+				<textElement/>
+				<text><![CDATA[********************************************************************************************************************************************]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="28">
+			<textField hyperlinkType="None">
+				<reportElement x="4" y="4" width="80" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{S_NO}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="141" y="5" width="80" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{TRAINNO}]]></textFieldExpression>
+			</textField>
+			<textField hyperlinkType="None">
+				<reportElement x="295" y="6" width="89" height="20"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{CATCHG}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="16">
+			<staticText>
+				<reportElement x="472" y="1" width="45" height="13"/>
+				<textElement/>
+				<text><![CDATA[By CRIS]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="58">
+			<staticText>
+				<reportElement x="5" y="1" width="539" height="15"/>
+				<textElement/>
+				<text><![CDATA[********************************************************************************************************************************************]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="5" y="19" width="107" height="20"/>
+				<textElement/>
+				<text><![CDATA[Total Catering Charge]]></text>
+			</staticText>
+			<textField hyperlinkType="None">
+				<reportElement x="298" y="19" width="92" height="20"/>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$V{TotalCatchg}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="4" y="39" width="539" height="15"/>
+				<textElement/>
+				<text><![CDATA[********************************************************************************************************************************************]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>
